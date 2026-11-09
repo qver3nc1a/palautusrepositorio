@@ -25,6 +25,20 @@ class PlayerStats:
         players.sort(key=lambda player: player.goals + player.assists, reverse=True)
         return players
 
+    def top_scores_by_team(self, team):
+        players = [player for player in self.players if player.team == team]
+        players.sort(key=lambda player: player.goals + player.assists, reverse=True)
+        return players
+
+    def top_goal_scorers(self, how_many):
+        """Palauttaa how_many eniten maaleja tehnyttä pelaajaa maalimäärän mukaan laskevassa järjestyksessä
+
+        Args:
+            how_many: Palautettavien pelaajien määrä.
+        """
+        players = sorted(self.players, key=lambda player: player.goals, reverse=True)
+        return players[:how_many]
+
 
 def main():
     seasons = [
@@ -62,15 +76,23 @@ def main():
     ]
 
     season = Prompt.ask("Season:", choices=seasons, default="2024-25")
-    nationality = Prompt.ask("Nationality:", choices=nationalities, default="FIN")
-
     url = f"https://studies.cs.helsinki.fi/nhlstats/{season}/players"
 
     reader = PlayerReader(url)
     stats = PlayerStats(reader)
-    players = stats.top_scores_by_nationality(nationality)
+    filter_by = Prompt.ask(
+        "Show players by:", choices=["Team", "Nationality"], default="Team"
+    )
 
-    table = Table(title=f"Season {season} players from {nationality}")
+    if filter_by == "Team":
+        teams = sorted({player.team for player in stats.players})
+        selection = Prompt.ask("Team:", choices=teams, default=teams[0])
+        players = stats.top_scores_by_team(selection)
+    else:
+        selection = Prompt.ask("Nationality:", choices=nationalities, default="FIN")
+        players = stats.top_scores_by_nationality(selection)
+
+    table = Table(title=f"Season {season} players from {selection}")
 
     table.add_column("Player", style="magenta")
     table.add_column("Goals", justify="right", style="cyan")
