@@ -18,9 +18,9 @@ Login With Incorrect Password
     Login Should Fail With Message  Invalid username or password
 
 Login With Nonexistent Username
-    Set Username nonexistent
-    Set Password anypassword
-    Click button >> text=login
+    Set Username  nonexistent
+    Set Password  anypassword
+    Click  button >> text=login
     Login Should Fail With Message  Invalid username or password
 
 *** Keywords ***
